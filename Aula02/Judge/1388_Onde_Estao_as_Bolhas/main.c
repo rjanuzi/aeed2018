@@ -15,5 +15,11 @@ int main( void )
 	
 	changesCount[0] = 1;
 
+	for(int loop = 0; loop < loopCount; loop++)
+	{
+		//TODO
+		changesCount[0];
+	} 
+
 	return 0;
 }
