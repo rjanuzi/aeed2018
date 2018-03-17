@@ -16,6 +16,7 @@
 
 void sorter_swap(int* a, int* b);
 void sorter_selectionSort(int* array, int len);
+void sorter_insertionSort(int* array, int len);
 
 #endif /* _SORTER_H */
 

@@ -8,19 +8,13 @@ bool tester_isSorted(int* array, int len, bool desc)
 	{
 		for(i = 0; i < len-1; i++)
 			if(array[i] < array[i+1])
-			{
-				printf("%d < %d", array[i], array[i+1]);
 				return false;
-			}
 	}
 	else /* Asc */
 	{	
 		for(i = 0; i < len-1; i++)
 			if(array[i] > array[i+1])
-			{
-				printf("%d > %d", array[i], array[i+1]);
 				return false;
-			}
 	}
 
 	return true;
@@ -32,34 +26,52 @@ bool tester_checkSortAlgorithm(void (*algorithm)(int*,int))
 
 	//Random array
 	array = arrays_genRandomArray(TESTER_ARRAY_LEN);
-
 	algorithm(array, TESTER_ARRAY_LEN); //Sorting
-
 	if(tester_isSorted(array, TESTER_ARRAY_LEN, false))
-		printf("\nAsc ok\n");
+		printf("\nRandom - Asc ok\n");
 	else
-		printf("\nAsc ko\n");
+		printf("\nRandom - Asc ko\n");
+	free(array);
+
+	array = arrays_genRandomArray(TESTER_ARRAY_LEN);
+	algorithm(array, TESTER_ARRAY_LEN); //Sorting
+	if(tester_isSorted(array, TESTER_ARRAY_LEN, true))
+		printf("\nRandom - Desc ok\n");
+	else
+		printf("\nRandom - Desc ko\n");
 	free(array);
 
 	//Sorted array asc
 	array = arrays_genSortedAscArray(TESTER_ARRAY_LEN);
-
 	algorithm(array, TESTER_ARRAY_LEN); //Sorting
-
 	if(tester_isSorted(array, TESTER_ARRAY_LEN, false))
-		printf("\nAsc ok\n");
+		printf("\nAsc - Asc ok\n");
 	else
-		printf("\nAsc ko\n");
+		printf("\nAsc - Asc ko\n");
+	free(array);
+
+	array = arrays_genSortedAscArray(TESTER_ARRAY_LEN);
+	algorithm(array, TESTER_ARRAY_LEN); //Sorting
+	if(tester_isSorted(array, TESTER_ARRAY_LEN, true))
+		printf("\nAsc - Desc ok\n");
+	else
+		printf("\nAsc - Desc ko\n");
 	free(array);
 
 	//Sorted array desc
 	array = arrays_genSortedDescArray(TESTER_ARRAY_LEN);
-
 	algorithm(array, TESTER_ARRAY_LEN); //Sorting
-
 	if(tester_isSorted(array, TESTER_ARRAY_LEN, false))
-		printf("\nAsc ok\n");
+		printf("\nDesc - Asc ok\n");
 	else
-		printf("\nAsc ko\n");
+		printf("\nDesc - Asc ko\n");
+	free(array);
+
+	array = arrays_genSortedDescArray(TESTER_ARRAY_LEN);
+	algorithm(array, TESTER_ARRAY_LEN); //Sorting
+	if(tester_isSorted(array, TESTER_ARRAY_LEN, true))
+		printf("\nDesc - Desc ok\n");
+	else
+		printf("\nDesc - Desc ko\n");
 	free(array);
 }

@@ -24,3 +24,8 @@ void sorter_selectionSort(int* array, int len)
 			sorter_swap(&array[i], &array[menor]);
 	}
 }
+
+void sorter_insertionSort(int* array, int len)
+{
+	
+}

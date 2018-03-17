@@ -21,13 +21,16 @@
 #define DESC_STR 	" (DESC)"
 
 void runExecTest(void (*algorithm)(int*,int), char* algorithmName, FILE* openedFile);
+unsigned long long avg(unsigned long long* times);
 
 int main( void )
 {
+//	FILE* openedFile;
 
-//	tester_checkSortAlgorithm(&sorter_selectionSort);
+	tester_checkSortAlgorithm(&sorter_insertionSort);
 
-	runExecTest(&sorter_selectionSort, "selectionSort", csv_create("times.csv"));
+//	openedFile = csv_create("times.csv");
+//	runExecTest(&sorter_selectionSort, "selectionSort", openedFile);
 
 	return 0;
 }
@@ -38,8 +41,9 @@ void runExecTest(void (*algorithm)(int*,int), char* algorithmName, FILE* openedF
 	void* ptr;
 	csvLine_t lineTemp;
 	int* array;
-	int i;
+	int i, j;
 	char* relativeName;
+	unsigned long long times[5];
 
 	if(openedFile == NULL)
 	{
@@ -52,13 +56,19 @@ void runExecTest(void (*algorithm)(int*,int), char* algorithmName, FILE* openedF
 	strcpy(relativeName, algorithmName);
 	strcat(relativeName, RANDOM_STR);
 
+
 	lineTemp.algorithm = relativeName;
 	for(i = 0, ptr = (void*) &lineTemp._10_1_time; i < 8; i++, ptr += sizeof(unsigned long long) )
 	{
-		timer_start();
-		array = arrays_genRandomArray(sizes[i]);
-		*((unsigned long long*)ptr) = timer_uStop();
-		free(array);
+		for(j = 0; j < 5; j++)
+		{
+			timer_start();
+			array = arrays_genRandomArray(sizes[i]);
+			times[j] = timer_uStop();
+			free(array);
+		}
+
+		*((unsigned long long*)ptr) = avg(times);
 	}
 
 	//Save results
@@ -99,5 +109,16 @@ void runExecTest(void (*algorithm)(int*,int), char* algorithmName, FILE* openedF
 	csv_appendLine(openedFile, lineTemp);
 
 	fclose(openedFile);
+}
+
+unsigned long long avg(unsigned long long* times)
+{
+	unsigned long long result;
+
+	result = (times[0]+times[1]+times[2]+times[3]+times[4])/5;
+
+	printf("\n%lld, %lld, %lld, %lld, %lld -> %lld\n", times[0],times[1],times[2],times[3],times[4], result);
+
+	return result;
 }
 
