@@ -17,6 +17,8 @@
 
 int* arrays_allocArray(int len);
 int* arrays_genRandomArray(int len);
+int* arrays_genSortedAscArray(int len);
+int* arrays_genSortedDescArray(int len);
 
 #endif /* _ARRAYS_H */
 

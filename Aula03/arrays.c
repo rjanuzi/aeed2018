@@ -26,3 +26,29 @@ int* arrays_genRandomArray(int len)
 
 	return array;
 }
+
+int* arrays_genSortedAscArray(int len)
+{
+	int* array;
+	int i;
+
+	array = arrays_allocArray(len);
+
+	for(i = 0; i < len; i++)
+		array[i] = i;
+
+	return array;
+}
+
+int* arrays_genSortedDescArray(int len)
+{
+	int* array;
+	int i, j;
+
+	array = arrays_allocArray(len);
+
+	for(i = 0, j = (len-1); i < len; i++, j--)
+		array[i] = j;
+
+	return array;
+}

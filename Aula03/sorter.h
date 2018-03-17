@@ -12,8 +12,10 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
-//Functions prototypes
+void sorter_swap(int* a, int* b);
+void sorter_selectionSort(int* array, int len);
 
 #endif /* _SORTER_H */
 
