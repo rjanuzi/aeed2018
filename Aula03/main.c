@@ -82,10 +82,15 @@ void runExecTest(void (*algorithm)(int*,int), char* algorithmName, FILE* openedF
 	lineTemp.algorithm = relativeName;
 	for(i = 0, ptr = (void*) &lineTemp._10_1_time; i < 8; i++, ptr += sizeof(unsigned long long) )
 	{
-		timer_start();
-		array = arrays_genSortedAscArray(sizes[i]);
-		*((unsigned long long*)ptr) = timer_uStop();
-		free(array);
+		for(j = 0; j < 5; j++)
+		{
+			timer_start();
+			array = arrays_genSortedAscArray(sizes[i]);
+			times[j] = timer_uStop();
+			free(array);
+		}
+
+		*((unsigned long long*)ptr) = avg(times);
 	}
 
 	//Save results
@@ -99,10 +104,15 @@ void runExecTest(void (*algorithm)(int*,int), char* algorithmName, FILE* openedF
 	lineTemp.algorithm = relativeName;
 	for(i = 0, ptr = (void*) &lineTemp._10_1_time; i < 8; i++, ptr += sizeof(unsigned long long) )
 	{
-		timer_start();
-		array = arrays_genSortedDescArray(sizes[i]);
-		*((unsigned long long*)ptr) = timer_uStop();
-		free(array);
+		for(j = 0; j < 5; j++)
+		{
+			timer_start();
+			array = arrays_genSortedDescArray(sizes[i]);
+			times[j] = timer_uStop();
+			free(array);
+		}
+
+		*((unsigned long long*)ptr) = avg(times);
 	}
 
 	//Save results
