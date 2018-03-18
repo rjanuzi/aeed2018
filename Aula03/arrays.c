@@ -47,7 +47,7 @@ int* arrays_genSortedDescArray(int len)
 
 	array = arrays_allocArray(len);
 
-	for(i = 0, j = (len-1); i < len; i++, j--)
+	for(i = 0, j = len-1; i < len; i++, j--)
 		array[i] = j;
 
 	return array;

@@ -28,50 +28,26 @@ bool tester_checkSortAlgorithm(void (*algorithm)(int*,int))
 	array = arrays_genRandomArray(TESTER_ARRAY_LEN);
 	algorithm(array, TESTER_ARRAY_LEN); //Sorting
 	if(tester_isSorted(array, TESTER_ARRAY_LEN, false))
-		printf("\nRandom - Asc ok\n");
+		printf("\nRandom ok\n");
 	else
-		printf("\nRandom - Asc ko\n");
-	free(array);
-
-	array = arrays_genRandomArray(TESTER_ARRAY_LEN);
-	algorithm(array, TESTER_ARRAY_LEN); //Sorting
-	if(tester_isSorted(array, TESTER_ARRAY_LEN, true))
-		printf("\nRandom - Desc ok\n");
-	else
-		printf("\nRandom - Desc ko\n");
+		printf("\nRandom ko\n");
 	free(array);
 
 	//Sorted array asc
 	array = arrays_genSortedAscArray(TESTER_ARRAY_LEN);
 	algorithm(array, TESTER_ARRAY_LEN); //Sorting
 	if(tester_isSorted(array, TESTER_ARRAY_LEN, false))
-		printf("\nAsc - Asc ok\n");
+		printf("\nAsc ok\n");
 	else
-		printf("\nAsc - Asc ko\n");
-	free(array);
-
-	array = arrays_genSortedAscArray(TESTER_ARRAY_LEN);
-	algorithm(array, TESTER_ARRAY_LEN); //Sorting
-	if(tester_isSorted(array, TESTER_ARRAY_LEN, true))
-		printf("\nAsc - Desc ok\n");
-	else
-		printf("\nAsc - Desc ko\n");
+		printf("\nAsc ko\n");
 	free(array);
 
 	//Sorted array desc
 	array = arrays_genSortedDescArray(TESTER_ARRAY_LEN);
 	algorithm(array, TESTER_ARRAY_LEN); //Sorting
 	if(tester_isSorted(array, TESTER_ARRAY_LEN, false))
-		printf("\nDesc - Asc ok\n");
+		printf("\nDesc ok\n");
 	else
-		printf("\nDesc - Asc ko\n");
-	free(array);
-
-	array = arrays_genSortedDescArray(TESTER_ARRAY_LEN);
-	algorithm(array, TESTER_ARRAY_LEN); //Sorting
-	if(tester_isSorted(array, TESTER_ARRAY_LEN, true))
-		printf("\nDesc - Desc ok\n");
-	else
-		printf("\nDesc - Desc ko\n");
+		printf("\nDesc ko\n");
 	free(array);
 }
