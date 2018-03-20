@@ -1,3 +1,6 @@
 *.exe
 *.out
 times.csv
+.cproject
+.project
+.settings/

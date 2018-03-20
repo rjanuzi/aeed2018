@@ -27,11 +27,15 @@ int main( void )
 {
 	FILE* openedFile;
 
-//	tester_checkSortAlgorithm(&sorter_insertionSort);
+//	tester_checkSortAlgorithm(&sorter_heapSort);
 
 	openedFile = csv_create("times.csv");
-	runExecTest(&sorter_selectionSort, "selectionSort", openedFile);
-	runExecTest(&sorter_insertionSort, "insertionSort", openedFile);
+	runExecTest(&sorter_selectionSort, "Selection Sort", openedFile);
+	runExecTest(&sorter_insertionSort, "Insertion Sort", openedFile);
+	runExecTest(&sorter_bubbleSort, "Bubble Sort", openedFile);
+	runExecTest(&sorter_shellSort, "Shell Sort", openedFile);
+	runExecTest(&sorter_quickSortCaller, "Quick Sort", openedFile);
+	runExecTest(&sorter_heapSort, "Heap Sort", openedFile);
 
 	fclose(openedFile);
 
@@ -62,12 +66,13 @@ void runExecTest(void (*algorithm)(int*,int), char* algorithmName, FILE* openedF
 	printf("\nTesting %s...\n", relativeName);
 
 	lineTemp.algorithm = relativeName;
-	for(i = 0, ptr = (void*) &lineTemp._10_1_time; i < 8; i++, ptr += sizeof(unsigned long long) )
+	for(i = 0, ptr = (void*) &lineTemp._10_1_time; i < 5; i++, ptr += sizeof(unsigned long long) )
 	{
 		for(j = 0; j < 5; j++)
 		{
-			timer_start();
 			array = arrays_genRandomArray(sizes[i]);
+			timer_start();
+			algorithm(array, sizes[i]);
 			times[j] = timer_uStop();
 			free(array);
 		}
@@ -88,12 +93,13 @@ void runExecTest(void (*algorithm)(int*,int), char* algorithmName, FILE* openedF
 	printf("\nTesting %s...\n", relativeName);
 
 	lineTemp.algorithm = relativeName;
-	for(i = 0, ptr = (void*) &lineTemp._10_1_time; i < 8; i++, ptr += sizeof(unsigned long long) )
+	for(i = 0, ptr = (void*) &lineTemp._10_1_time; i < 5; i++, ptr += sizeof(unsigned long long) )
 	{
 		for(j = 0; j < 5; j++)
 		{
-			timer_start();
 			array = arrays_genSortedAscArray(sizes[i]);
+			timer_start();
+			algorithm(array, sizes[i]);
 			times[j] = timer_uStop();
 			free(array);
 		}
@@ -114,12 +120,13 @@ void runExecTest(void (*algorithm)(int*,int), char* algorithmName, FILE* openedF
 	printf("\nTesting %s...\n", relativeName);
 
 	lineTemp.algorithm = relativeName;
-	for(i = 0, ptr = (void*) &lineTemp._10_1_time; i < 8; i++, ptr += sizeof(unsigned long long) )
+	for(i = 0, ptr = (void*) &lineTemp._10_1_time; i < 5; i++, ptr += sizeof(unsigned long long) )
 	{
 		for(j = 0; j < 5; j++)
 		{
-			timer_start();
 			array = arrays_genSortedDescArray(sizes[i]);
+			timer_start();
+			algorithm(array, sizes[i]);
 			times[j] = timer_uStop();
 			free(array);
 		}
