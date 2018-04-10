@@ -9,6 +9,11 @@ typedef struct stack_s {
 	struct stack_s* below;
 } stack_t;
 
+typedef struct list_s {
+	char val;
+	struct list_s* nxt;
+} list_t;
+
 void push(stack_t** stack, char val)
 {
 	stack_t* newNode;
@@ -16,7 +21,7 @@ void push(stack_t** stack, char val)
 	if(DEBUG)
 		printf("\nPushing %c\n", val);
 
-	newNode = malloc(sizeof(stack_t));
+	newNode = calloc(sizeof(stack_t), 1);
 	newNode->val = val;
 
 	if(*stack == NULL)
@@ -68,6 +73,51 @@ char getTop(stack_t** stack)
 		printf("\nGetting top %c\n", (*stack)->val);
 
 	return (*stack)->val;
+}
+
+void add(list_t** list, char val)
+{
+	list_t* newNode;
+	list_t* last;
+
+	newNode = malloc(sizeof(list_t));
+	newNode->val = val;
+	newNode->nxt = NULL;
+
+	if(*list == NULL)
+		*list = newNode;
+	else
+	{
+		last = *list;
+		while(last->nxt != NULL)
+			last = last->nxt;
+
+		last->nxt = newNode;
+	}
+}
+
+char removeFirst(list_t** list)
+{
+	list_t* nodeToRemove;
+	char result;
+
+	if(*list == NULL)
+		return '\0';
+
+	nodeToRemove = *list;
+	*list = (*list)->nxt;
+
+	result = nodeToRemove->val;
+
+	free(nodeToRemove);
+
+	return result;
+}
+
+void printRemoveAll(list_t** list)
+{
+	while(*list != NULL)
+		printf("%c", removeFirst(list));
 }
 
 bool isOperando(char val)
@@ -149,63 +199,90 @@ void printStack(stack_t** stack)
 
 int main( void )
 {
+	list_t* outBuffer = NULL;
 	stack_t* stack = NULL;
-	int i = -1;
-	char tempChar, tempChar2;
+	char newChar, tempChar;
 
-	do {
+	while(true) {
 
-		scanf("%c", &tempChar);
+		//Program end - Print result for the last input and end program
+		if(scanf("%c", &newChar) == EOF)
+		{
+			if(stack == NULL)
+				printRemoveAll(&outBuffer);
+			else
+				printf("Syntax Error!\n");
+
+			break;
+		}
 
 		//If is operand, print it
-		if(isOperando(tempChar))
+		if(isOperando(newChar))
 		{
-			printf("%c", tempChar);
+			add(&outBuffer, newChar);
 			continue;
 		}
 
-		if(tempChar == '(')
+		if(newChar == '(')
 		{
-			push(&stack, tempChar);
+			push(&stack, newChar);
 			continue;
 		}
 
-		if(tempChar == ')' || tempChar == '!')
+		if(newChar == ')')
 		{
-			while( stack != NULL && (tempChar2 = pop(&stack)) != '(' )
-				printf("%c", tempChar2);
-
+			while( stack != NULL && (tempChar = pop(&stack)) != '(' )
+				add(&outBuffer, tempChar);
 			continue;
 		}
 
-		if(isOperator(tempChar))
+		if(isOperator(newChar))
 		{
 			while(true)
 			{
 				//If is operator AND (the stack is empty OR the new input has greater priority than stack's top)
 				//Push it, and goes to next char
-				if(stack == NULL || hasGreaterPrior(tempChar, getTop(&stack)))
+				if(stack == NULL || hasGreaterPrior(newChar, getTop(&stack)))
 				{
-					push(&stack, tempChar);
+					push(&stack, newChar);
 					break;
 				}
 				else //The stack's top has minor or equal priority than new input, pop and print it. Then goes to next stack char
-					printf("%c", pop(&stack));
+					add(&outBuffer, pop(&stack));
 			}
+
+			continue;
 		}
 
-	} while(tempChar != '!');
+		//Line end - Print result for the last line and reinit stack and flags
+		if(newChar == '\n')
+		{
+			while( stack != NULL && isOperator(getTop(&stack)) )
+				add(&outBuffer, pop(&stack));
 
-	if(stack == NULL) {
-		//TODO - print posfixed
+			if(stack == NULL) {
+				printRemoveAll(&outBuffer);
+				printf("\n");
+			}
+			else
+				printf("Syntax Error!\n");
+
+			//Reinit stack
+			while(stack != NULL)
+				pop(&stack);
+
+			continue;
+		}
+
+		//If reach this point the char is not know or is the termination char
+
+		//Lexical Error finded - print message and reinit the stack
+		printf("Lexical Error!\n");
+
+		//Reinit stack
+		while(stack != NULL)
+			pop(&stack);
 	}
-	else
-		if(isOperator(getTop(&stack)))
-			printf("Syntax Error!");
-		else
-			printf("Lexical Error!");
-
-	printStack(&stack);
 
 	return 0;
 }
