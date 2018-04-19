@@ -1,4 +1,5 @@
 from openpyxl import load_workbook
+from openpyxl import Workbook
 
 # In use cols
 DATE_COL = 0
@@ -66,4 +67,12 @@ for row in ws.iter_rows(min_row = 2, max_col = 13):
         else:
                 sales_map[temp_key] = row[SALES_COL].value
 
-print(sales_map)
+res = Workbook()
+res_sheet = res.active
+
+for key, value in sales_map.items():
+        splited_key = key.split(",")
+        splited_key.append(value)
+        res_sheet.append(splited_key)
+
+res.save("result.xlsx")
