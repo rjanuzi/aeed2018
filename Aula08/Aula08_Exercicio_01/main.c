@@ -9,8 +9,8 @@ typedef struct tree_s {
 } tree_t;
 
 typedef struct stack_s {
-	int val;
-	tree_t* below;
+	tree_t* val;
+	struct stack_s* below;
 } stack_t;
 
 void add(tree_t** root, int val)
@@ -116,13 +116,13 @@ void push(stack_t** stack, tree_t* val)
 	*stack = newNode;
 }
 
-tree_t pop(stack_t** stack)
+tree_t* pop(stack_t** stack)
 {
 	stack_t* nodeToRemove;
-	char result;
+	tree_t* result;
 
 	if(*stack == NULL)
-		return -1;
+		return NULL;
 
 	nodeToRemove = *stack;
 	*stack = (*stack)->below;
@@ -137,31 +137,21 @@ tree_t pop(stack_t** stack)
 void emOrdemIte(tree_t* root)
 {
 	tree_t* tempNode;
-	stack_t* stack;
+	stack_t* stack = NULL;
 
 	tempNode = root;
 
-	while(tempNode != NULL)
+	while(tempNode != NULL || stack != NULL)
 	{
-		if(tempNode->left != NULL)
-		{
-			//Push and goes left
+		if(tempNode != NULL) {
 			push(&stack, tempNode);
 			tempNode = tempNode->left;
-			continue;
 		}
-
-		if(tempNode->right != NULL)
-		{
-			//Push and goes right
-			push(&stack, tempNode);
+		else {
+			tempNode = pop(&stack);
+			printf(" %d ", tempNode->val);
 			tempNode = tempNode->right;
-			continue;
 		}
-
-		//No children, pop
-		printf(" %d ", tempNode->val);
-		tempNode = tempNode->father;
 	}
 }
 
@@ -176,11 +166,14 @@ int main( void )
 	add(&root, 7);
 	add(&root, 8);
 
-	emOrdem(root);
-	printf("\n");
-	preOrdem(root);
-	printf("\n");
-	posOrdem(root);
+//	printf("Em ordem:");
+//	emOrdem(root);
+//	printf("\nPre ordem:");
+//	preOrdem(root);
+//	printf("\nPos ordem:");
+//	posOrdem(root);
+	printf("\nEm ordem (Iterativo):");
+	emOrdemIte(root);
 
 	return 0;
 }
