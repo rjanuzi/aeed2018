@@ -1,7 +1,7 @@
 *.exe
 *.out
-*.o
 times.csv
 .cproject
 .project
 .settings/
+*.o

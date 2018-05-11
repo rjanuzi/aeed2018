@@ -2,3 +2,4 @@ main.out
 .project
 .cproject
 .settings/
+*.o
