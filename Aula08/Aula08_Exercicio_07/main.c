@@ -1,10 +1,10 @@
+#include <limits.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <limits.h>
+
 #include "arrays.h"
-#include "timer.h"
 #include "csv.h"
+#include "timer.h"
 #include "trees.h"
 
 #define N 10000
@@ -82,7 +82,7 @@ void testBinaryArray(FILE* outputFile)
 	unsigned long long elapsedTime;
 	csvLine_t line;
 	int* array;
-	int bigger = INT_MAX, lower = INT_MIN, i;
+	int bigger, lower;
 
 	//Test Insertion
 	timer_start();
@@ -119,7 +119,7 @@ void testBinaryTree(FILE* outputFile)
 	csvLine_t line;
 	binTree_t* root;
 	binTree_t* nodeTemp;
-	int bigger = INT_MAX, lower = INT_MIN;
+	int bigger, lower;
 
 	//Test Insertion
 	timer_start();
@@ -166,5 +166,51 @@ void testBinaryTree(FILE* outputFile)
 
 void testAvlTree(FILE* outputFile)
 {
-	//TODO
+	unsigned long long elapsedTime;
+	csvLine_t line;
+	avlTree_t* root;
+	avlTree_t* nodeTemp;
+	int bigger, lower;
+
+	//Test Insertion
+	timer_start();
+	root = trees_genRandomAvlTree(N);
+	elapsedTime = timer_uStop();
+
+	line.testName = "AVL Tree\0";
+	line.timeInsertion = elapsedTime;
+
+	//Test Buscar o maior
+	timer_start();
+
+	//The bigger is the most right leaf
+	nodeTemp = root;
+	while(nodeTemp->right != NULL)
+		nodeTemp = nodeTemp->right;
+
+	bigger = nodeTemp->val;
+
+	elapsedTime = timer_uStop();
+
+	line.timeSearchBigger = elapsedTime;
+
+	//Test Buscar o menor
+	timer_start();
+
+	//The lower is the most left leaf
+	nodeTemp = root;
+	while(nodeTemp->left != NULL)
+		nodeTemp = nodeTemp->left;
+
+	lower = nodeTemp->val;
+
+	elapsedTime = timer_uStop();
+
+	line.timeSearchLower = elapsedTime;
+
+	printf("AVL Tree: Bigger = %d, Lower = %d\n", bigger, lower);
+
+	csv_appendLine(outputFile, line);
+
+	trees_freeAvlTree(root);
 }
