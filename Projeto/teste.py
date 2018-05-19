@@ -1,2 +1,2 @@
-lst = ['a', 'ab', 'abc', 'bac']
-print(filter(lambda k: 'ab' in k, lst))
+for i in range(1,3):
+    print(" " + str(i) + " ")

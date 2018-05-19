@@ -10,7 +10,8 @@ SALES_COL = 6
 inputFilePath = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\Dataset\\Ztco0018 2010_2015.xlsx"
 outputFilePath = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\treated_input.xlsx"
 
-ENTRIES_MIN_COUNT = 150
+ENTRIES_TOTAL_COUNT = 432 # 6 Periods by month (12) by year (6)
+ENTRIES_MIN_COUNT = 350 #Dataset contains 432 points
 
 def calcPeriod(day, month):
         "This function calculate the period of year"
@@ -41,7 +42,13 @@ def calcMonthPart(day):
                 return 5
         return 6
 
-print("Loading input\n")
+def buildKey(year, period, client, family):
+    return str(year) + "," + \
+        str(period)  + "," + \
+        str(tempClientName) + "," + \
+        str(tempFamilyName)
+
+print("Loading input")
 
 # Load Workbook. data_only = True force the formulas calculations
 wb = load_workbook(filename = inputFilePath, data_only = True) # Full input
@@ -53,8 +60,10 @@ ws = wb['Plan1']
 sales_map = dict()
 clients = []
 families = []
+finalClients = []
+finalFamilies = []
 
-print("Processing input\n")
+print("Processing input")
 
 # Start at row 2 to skip the table title
 for row in ws.iter_rows(min_row = 2, max_col = 13):
@@ -62,10 +71,15 @@ for row in ws.iter_rows(min_row = 2, max_col = 13):
     tempFamilyName = row[FAMILY_COL].value.encode('utf-8') # Encode to solve a dataset problem
     try:
         # Generate the map key
-        temp_key = str(row[DATE_COL].value.year) + "," + \
-                str( calcPeriod(row[DATE_COL].value.day, row[DATE_COL].value.month) )  + "," + \
-                str(tempClientName) + "," + \
-                str(tempFamilyName)
+        temp_key = buildKey(row[DATE_COL].value.year, \
+                    str( calcPeriod(row[DATE_COL].value.day, row[DATE_COL].value.month) ), \
+                    tempClientName, \
+                    str(tempFamilyName) )
+
+#        temp_key = str(row[DATE_COL].value.year) + "," + \
+#                str( calcPeriod(row[DATE_COL].value.day, row[DATE_COL].value.month) )  + "," + \
+#                str(tempClientName) + "," + \
+#                str(tempFamilyName)
 
         # Adjust quantity to the map
         if temp_key in sales_map:
@@ -85,7 +99,7 @@ for row in ws.iter_rows(min_row = 2, max_col = 13):
 wb.close()
 
 # Start filter clients and families with low data
-print("Filtering treted data\n")
+print("Filtering treted data")
 
 print("Removing clients and families with low data")
 
@@ -96,6 +110,8 @@ for client in clients:
         for keyToRemove in keysWithClient:
             if keyToRemove in sales_map:
                 del sales_map[keyToRemove]
+    else:
+        finalClients.append(client)
 
 keysList = list(sales_map.keys())
 for family in families:
@@ -104,8 +120,24 @@ for family in families:
         for keyToRemove in keysWithFamily:
             if keyToRemove in sales_map:
                 del sales_map[keyToRemove]
+    else:
+        finalFamilies.append(family)
 
-print("Saving treated_input\n")
+#Generate 0s for missing dots
+print("Adding 0s for missing entries")
+
+for year in range(2010, 2016):
+    for period in range(1, 73):
+        for client in finalClients:
+            for family in finalFamilies:
+                tempKey = buildKey(year, period, client, family)
+                if tempKey not in sales_map:
+                    sales_map[tempKey] = 0
+
+print( str(len(finalClients)) + " - clients: " + str(finalClients))
+print( str(len(finalFamilies)) + " - families: " + str(finalFamilies))
+
+print("Saving treated_input")
 
 res = Workbook()
 res_sheet = res.active
@@ -117,4 +149,4 @@ for key, value in sales_map.items():
 
 res.save(outputFilePath)
 
-print("Done\n")
+print("Done")
