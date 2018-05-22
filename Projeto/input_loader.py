@@ -5,14 +5,16 @@ from openpyxl import Workbook
 YEAR_COL = 0
 PERIOD_COL = 1
 FAMILY_COL = 2
-QTD_COL = 3
+SECANT_COL = 3
+QTD_COL = 4
 
 inputFilePath = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\treated_input.xlsx"
 
-def buildKey(year, period, family):
+def buildKey(year, period, family, secant):
     return str(year) + "," + \
         str(period)  + "," + \
-        str(family)
+        str(family) + "," + \
+        str(secant)
 
 def getInput():
     print("Loading input")
@@ -30,7 +32,9 @@ def getInput():
             temp_key = buildKey(
                 row[YEAR_COL].value,
                 row[PERIOD_COL].value,
-                row[FAMILY_COL].value.encode('utf-8'))
+                row[FAMILY_COL].value.encode('utf-8'),
+                row[SECANT_COL].value)
+
             # Adjust quantity to the map
             if temp_key in inputs:
                 print("[ERROR]: input_loader.py - Loading - duplicated key: " + temp_key)

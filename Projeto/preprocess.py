@@ -6,15 +6,25 @@ DATE_COL = 0
 FAMILY_COL = 2
 SALES_COL = 6
 
-PERIOD_COUNT = 6*12
-PERIOD_COUNT_V2 = 11*12
+PERIOD_COUNT = 11*12
 
-inputFilePath = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\Dataset\\Ztco0018 2010_2015.xlsx"
-outputFilePath = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\treated_input.xlsx"
+PERIOD_MIN = 1
+PERIOD_MAX = PERIOD_COUNT+1
+YEAR_MIN = 2010
+YEAR_MAX = 2016 #2015 + 1
 
-#Ex: angularCoefficient([-5.0,4.0], [3.0,2.0])
-def angularCoefficient(A, B):
-    return (B[1]-A[1]) / (B[0]-A[0])
+INPUT_FILE_PATH = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\Dataset\\Ztco0018 2010_2015.xlsx"
+OUTPUT_FILE_PATH = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\treated_input.xlsx"
+
+def getBefore(year, period):
+    if(period > PERIOD_MIN):
+        return year, period-1
+    else:
+        if(year > YEAR_MIN):
+            return year-1, PERIOD_MAX-1
+        else:
+            return -1, -1
+
 
 def calcPeriod(day, month):
         "This function calculate the period of year"
@@ -97,7 +107,7 @@ def buildKey(year, period, family):
 print("Loading input")
 
 # Load Workbook. data_only = True force the formulas calculations
-wb = load_workbook(filename = inputFilePath, data_only = True) # Full input
+wb = load_workbook(filename = INPUT_FILE_PATH, data_only = True) # Full input
 
 # Get the desired Sheet
 ws = wb['Plan1']
@@ -135,16 +145,41 @@ wb.close()
 #Generate 0s for missing dots
 print("Adding 0s for missing entries")
 
-period_min = 1
-period_max = PERIOD_COUNT_V2+1
 for family in families:
     keysList = list(sales_map.keys())
     keysWithFamily = filter(lambda k: family in k, keysList)
-    for year in range(2010, 2016):
-        for period in range(period_min, period_max):
+    for year in range(YEAR_MIN, YEAR_MAX):
+        for period in range(PERIOD_MIN, PERIOD_MAX):
             tempKey = buildKey(year, period, family)
             if tempKey not in sales_map:
                 sales_map[tempKey] = 0
+
+#Add secant info
+print("Adding the secant info")
+
+newMap = dict()
+for family in families:
+    keysList = list(sales_map.keys())
+    keysWithFamily = filter(lambda k: family in k, keysList)
+    for year in range(YEAR_MIN, YEAR_MAX):
+        for period in range(PERIOD_MIN, PERIOD_MAX):
+            currentKey = buildKey(year, period, family)
+            yearBefore, periodBefore = getBefore(year, period)
+            if yearBefore < YEAR_MIN or periodBefore < PERIOD_MIN:
+                secant = 0.0 # No val before
+            else:
+                # f'(x0) ~= (f(x0+h) - f(x0)) / h
+                # In this case h = -1
+                # So f'(x0) ~= (f(x0-1) - f(x0)) / -1
+
+                valBefore = float(sales_map[buildKey(yearBefore, periodBefore, family)])
+                fx0 = float(sales_map[currentKey])
+                secant = (valBefore - fx0) / -1.0
+
+            newMap[currentKey+","+str(secant)] = sales_map[currentKey] # Append the info about secant to the new key
+
+sales_map.clear()
+sales_map = newMap # sales_map now has the secant appended to the key
 
 print("Saving treated_input")
 
@@ -156,7 +191,7 @@ for key, value in sales_map.items():
             splited_key.append(value)
             res_sheet.append(splited_key)
 
-res.save(outputFilePath)
+res.save(OUTPUT_FILE_PATH)
 res.close()
 
 print("Done")
