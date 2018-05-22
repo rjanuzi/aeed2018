@@ -4,16 +4,14 @@ from openpyxl import Workbook
 # In use cols
 YEAR_COL = 0
 PERIOD_COL = 1
-CLIENT_COL = 2
-FAMILY_COL = 3
-QTD_COL = 4
+FAMILY_COL = 2
+QTD_COL = 3
 
 inputFilePath = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\treated_input.xlsx"
 
-def buildKey(year, period, client, family):
+def buildKey(year, period, family):
     return str(year) + "," + \
         str(period)  + "," + \
-        str(client) + "," + \
         str(family)
 
 def getInput():
@@ -26,16 +24,18 @@ def getInput():
     # Create new dictionary
     inputs = dict()
     # Start at row 2 to skip the table title
-    for row in ws.iter_rows(min_row = 1, max_col = 6):
+    for row in ws.iter_rows(min_row = 1, max_col = 5):
         try:
             # Generate the map key
-            temp_key = buildKey(row[YEAR_COL].value, row[PERIOD_COL].value, \
-                    row[CLIENT_COL].value, row[FAMILY_COL].value)
+            temp_key = buildKey(
+                row[YEAR_COL].value,
+                row[PERIOD_COL].value,
+                row[FAMILY_COL].value.encode('utf-8'))
             # Adjust quantity to the map
             if temp_key in inputs:
                 print("[ERROR]: input_loader.py - Loading - duplicated key: " + temp_key)
             else:
-                inputs[temp_key] = int(row[QTD_COL].value)
+                inputs[temp_key] = row[QTD_COL].value
         except ValueError:
             print "Oops! Error interpreting the file"
 

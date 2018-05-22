@@ -5,4 +5,8 @@ import input_loader
 
 inputs = input_loader.getInput()
 
+def dist():
+    print("[ERROR]: Not implemented")
+    #TODO
+
 #TODO
