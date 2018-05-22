@@ -24,7 +24,7 @@ def calcDist(x1, x2):
             [int(x2Vals[0]),int(x2Vals[1])] )
 
 def knn(k, dataset, new, error):
-    datasetKeys = sales_map.keys()
+    datasetKeys = dataset.keys()
     distances = []
 
     for key in dataset:
@@ -34,8 +34,6 @@ def knn(k, dataset, new, error):
 
 inputs = input_loader.getInput()
 testingElementKey = random.choice(inputs.keys())
-#testingVal = input.pop(testingElementKey)
+testingVal = inputs.pop(testingElementKey)
 
-print(testingElementKey)
-
-#knn(10, inputs, testingElementKey, 0.5)
+knn(10, inputs, testingElementKey, 0.5)
