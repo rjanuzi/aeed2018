@@ -16,16 +16,6 @@ YEAR_MAX = 2016 #2015 + 1
 INPUT_FILE_PATH = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\Dataset\\Ztco0018 2010_2015.xlsx"
 OUTPUT_FILE_PATH = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\treated_input.xlsx"
 
-def getBefore(year, period):
-    if(period > PERIOD_MIN):
-        return year, period-1
-    else:
-        if(year > YEAR_MIN):
-            return year-1, PERIOD_MAX-1
-        else:
-            return -1, -1
-
-
 def calcPeriod(day, month):
         "This function calculate the period of year"
         month_part = calcMonthPart(day)
@@ -153,33 +143,6 @@ for family in families:
             tempKey = buildKey(year, period, family)
             if tempKey not in sales_map:
                 sales_map[tempKey] = 0
-
-#Add secant info
-print("Adding the secant info")
-
-newMap = dict()
-for family in families:
-    keysList = list(sales_map.keys())
-    keysWithFamily = filter(lambda k: family in k, keysList)
-    for year in range(YEAR_MIN, YEAR_MAX):
-        for period in range(PERIOD_MIN, PERIOD_MAX):
-            currentKey = buildKey(year, period, family)
-            yearBefore, periodBefore = getBefore(year, period)
-            if yearBefore < YEAR_MIN or periodBefore < PERIOD_MIN:
-                secant = 0.0 # No val before
-            else:
-                # f'(x0) ~= (f(x0+h) - f(x0)) / h
-                # In this case h = -1
-                # So f'(x0) ~= (f(x0-1) - f(x0)) / -1
-
-                valBefore = float(sales_map[buildKey(yearBefore, periodBefore, family)])
-                fx0 = float(sales_map[currentKey])
-                secant = (valBefore - fx0) / -1.0
-
-            newMap[currentKey+","+str(secant)] = sales_map[currentKey] # Append the info about secant to the new key
-
-sales_map.clear()
-sales_map = newMap # sales_map now has the secant appended to the key
 
 print("Saving treated_input")
 

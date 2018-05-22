@@ -5,16 +5,14 @@ from openpyxl import Workbook
 YEAR_COL = 0
 PERIOD_COL = 1
 FAMILY_COL = 2
-SECANT_COL = 3
-QTD_COL = 4
+QTD_COL = 3
 
 inputFilePath = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\treated_input.xlsx"
 
-def buildKey(year, period, family, secant):
+def buildKey(year, period, family):
     return str(year) + "," + \
         str(period)  + "," + \
-        str(family) + "," + \
-        str(secant)
+        str(family)
 
 def getInput():
     print("Loading input")
@@ -29,11 +27,10 @@ def getInput():
     for row in ws.iter_rows(min_row = 1, max_col = 5):
         try:
             # Generate the map key
-            temp_key = buildKey(
-                row[YEAR_COL].value,
-                row[PERIOD_COL].value,
-                row[FAMILY_COL].value.encode('utf-8'),
-                row[SECANT_COL].value)
+            temp_key = buildKey( \
+                row[YEAR_COL].value, \
+                row[PERIOD_COL].value, \
+                row[FAMILY_COL].value.encode('utf-8'))
 
             # Adjust quantity to the map
             if temp_key in inputs:
