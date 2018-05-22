@@ -13,6 +13,10 @@ outputFilePath = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\treated_input.x
 ENTRIES_TOTAL_COUNT = 432 # 6 Periods by month (12) by year (6)
 ENTRIES_MIN_COUNT = 350 #Dataset contains 432 points
 
+#Ex: angularCoefficient([-5.0,4.0], [3.0,2.0])
+def angularCoefficient(A, B):
+    return (B[1]-A[1]) / (B[0]-A[0])
+
 def calcPeriod(day, month):
         "This function calculate the period of year"
         month_part = calcMonthPart(day)
@@ -45,8 +49,11 @@ def calcMonthPart(day):
 def buildKey(year, period, client, family):
     return str(year) + "," + \
         str(period)  + "," + \
-        str(tempClientName) + "," + \
-        str(tempFamilyName)
+        str(client) + "," + \
+        str(family)
+
+def m(x0, x1, y0, y1)
+    return (y1-y0) / (x1-x0)
 
 print("Loading input")
 
@@ -76,11 +83,6 @@ for row in ws.iter_rows(min_row = 2, max_col = 13):
                     tempClientName, \
                     str(tempFamilyName) )
 
-#        temp_key = str(row[DATE_COL].value.year) + "," + \
-#                str( calcPeriod(row[DATE_COL].value.day, row[DATE_COL].value.month) )  + "," + \
-#                str(tempClientName) + "," + \
-#                str(tempFamilyName)
-
         # Adjust quantity to the map
         if temp_key in sales_map:
                 sales_map[temp_key] = sales_map[temp_key] + row[SALES_COL].value
@@ -99,7 +101,7 @@ for row in ws.iter_rows(min_row = 2, max_col = 13):
 wb.close()
 
 # Start filter clients and families with low data
-print("Filtering treted data")
+print("Filtering treated data")
 
 print("Removing clients and families with low data")
 
@@ -126,16 +128,18 @@ for family in families:
 #Generate 0s for missing dots
 print("Adding 0s for missing entries")
 
-for year in range(2010, 2016):
-    for period in range(1, 73):
-        for client in finalClients:
-            for family in finalFamilies:
+for client in finalClients:
+    for family in finalFamilies:
+        keysList = list(sales_map.keys())
+        keysWithFamily = filter(lambda k: family in k, keysList)
+        keysWithFamilyAndClient = filter(lambda k: client in k, keysWithFamily)
+        if len(keysWithFamilyAndClient) == 0:
+            continue #Ignore null client x family realtions
+        for year in range(2010, 2016):
+            for period in range(1, 73):
                 tempKey = buildKey(year, period, client, family)
                 if tempKey not in sales_map:
                     sales_map[tempKey] = 0
-
-print( str(len(finalClients)) + " - clients: " + str(finalClients))
-print( str(len(finalFamilies)) + " - families: " + str(finalFamilies))
 
 print("Saving treated_input")
 
@@ -148,5 +152,6 @@ for key, value in sales_map.items():
             res_sheet.append(splited_key)
 
 res.save(outputFilePath)
+res.close()
 
 print("Done")
