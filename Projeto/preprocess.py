@@ -1,5 +1,7 @@
 from openpyxl import load_workbook
 from openpyxl import Workbook
+from xlsWriter import saveEntriesDict
+from xlsWriter import KnnResult
 
 # In use cols
 DATE_COL = 0
@@ -7,7 +9,6 @@ FAMILY_COL = 2
 SALES_COL = 6
 
 PERIOD_COUNT = 11*12
-
 PERIOD_MIN = 1
 PERIOD_MAX = PERIOD_COUNT+1
 YEAR_MIN = 2010
@@ -146,15 +147,6 @@ for family in families:
 
 print("Saving treated_input")
 
-res = Workbook()
-res_sheet = res.active
-
-for key, value in sales_map.items():
-            splited_key = key.split(",")
-            splited_key.append(value)
-            res_sheet.append(splited_key)
-
-res.save(OUTPUT_FILE_PATH)
-res.close()
+saveEntriesDict(OUTPUT_FILE_PATH, sales_map)
 
 print("Done")

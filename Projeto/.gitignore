@@ -1,2 +1,4 @@
 treated_input.xlsx
 *.pyc
+predicted.xlsx
+calcRandomAccuracyResult.xlsx
