@@ -1,5 +1,8 @@
+from accuracyCalculator import kFoldSplit
 
-x = [4.3, 2.14, 2.13, 3.1]
-head, tail = x[0], x[-1]
-print(head)
-print(tail)
+map = {"A":1, "B":2, "C":3, "D":4, "E":5, "F":6, "G":7, "H":8, "J":9, "K":10 }
+mapItens = map.items()
+
+mapsList = kFoldSplit(map, 5)
+for subMap in mapsList:
+    print(subMap)

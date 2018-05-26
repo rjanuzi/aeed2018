@@ -18,20 +18,19 @@ class KnnResult:
     filterMaxMin = False
     useMedian = False
     averageError = 0.0
-    medianError = 0.0
     maxError = 0.0
     minError = 0.0
+    accuracy = 0.0
 
     def __repr__(self):
         return str(self.paramK) + "," + str(self.filterMaxMin) + "," + str(self.useMedian) + "," \
-            + str(self.averageError) + "," + str(self.medianError) + "," + str(self.maxError) + "," \
-            + str(self.minError)
+            + str(self.averageError) + "," + str(self.maxError) + "," + str(self.minError) + "," + str(self.accuracy)
 
 def saveKnnResultList(knnResultList, filePath):
     res = Workbook()
     res_sheet = res.active
 
-    res_sheet.append(["K", "Filter Max/Min", "Use Median", "Average Error", "Median Error", "Max Error", "Min Error"])
+    res_sheet.append(["K", "Filter Max/Min", "Use Median", "Average Error", "Max Error", "Min Error", "Accuracy"])
     for result in knnResultList:
         res_sheet.append(str(result).split(","))
 

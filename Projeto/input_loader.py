@@ -7,7 +7,7 @@ PERIOD_COL = 1
 FAMILY_COL = 2
 QTD_COL = 3
 
-inputFilePath = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\treated_input.xlsx"
+inputFilePath = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\treated.xlsx"
 
 def buildKey(year, period, family):
     return str(year) + "," + \
@@ -48,6 +48,6 @@ def getInput():
             print "Oops! Error interpreting the file"
 
     wb.close()
-    print("Input Loaded: " + str(len(inputs)) + " entries")
+    print("Input Loaded: " + str(len(inputs)) + " entries with " + str(len(families)) + " families.")
 
     return inputs, families

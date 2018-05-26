@@ -15,7 +15,7 @@ YEAR_MIN = 2010
 YEAR_MAX = 2016 #2015 + 1
 
 INPUT_FILE_PATH = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\Dataset\\Ztco0018 2010_2015.xlsx"
-OUTPUT_FILE_PATH = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\treated_input.xlsx"
+OUTPUT_FILE_PATH = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\treated.xlsx"
 
 def calcPeriod(day, month):
         "This function calculate the period of year"
@@ -136,16 +136,17 @@ wb.close()
 #Generate 0s for missing dots
 print("Adding 0s for missing entries")
 
-for family in families:
-    keysList = list(sales_map.keys())
-    keysWithFamily = filter(lambda k: family in k, keysList)
+for i in range(len(families)):
+    print("Adding 0s: " + str((float(i)/float(len(families)))*100.0) + "%")
+    keysOfInterest = filter(lambda f: families[i] in f, sales_map.keys())
     for year in range(YEAR_MIN, YEAR_MAX):
         for period in range(PERIOD_MIN, PERIOD_MAX):
-            tempKey = buildKey(year, period, family)
-            if tempKey not in sales_map:
+            tempKey = buildKey(year, period, families[i])
+            if tempKey not in keysOfInterest:
                 sales_map[tempKey] = 0
+    i += 1
 
-print("Saving treated_input")
+print("Saving treated.xlsx: Data: " + str(len(sales_map.keys())) + " with " + str(len(families)) + " families.")
 
 saveEntriesDict(OUTPUT_FILE_PATH, sales_map)
 

@@ -5,12 +5,22 @@ import input_loader
 from xlsWriter import KnnResult
 from xlsWriter import saveEntriesDict
 from xlsWriter import saveKnnResultList
+from accuracyCalculator import compare
+from accuracyCalculator import calcAccuracy
 
 PREDICTED_OUTPUT_FILE_PATH = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\predicted.xlsx"
 RNDM_ACC_OUTPUT_FILE_PATH = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\calcRandomAccuracyResult.xlsx"
+YEARS_ACC_OUTPUT_FILE_PATH = "C:\\Users\\Rafael\\Desktop\\aeed2018\\Projeto\\calcAccuracyForYearsResult.xlsx"
 
 K_DEFAULT_PARAM = 5
-DEFAULT_ACCEPTED_ERROR = 1000
+FAMILY_KEYS_DEFAULT_PARAM = None
+FILTER_MAX_MIN_DEFAULT_PARAM = False
+USE_MEADIAN_DEFAULT_PARAM = False
+ERROR_MARGIN_DEFAULT = 20.0
+
+PERIOD_COUNT = 11*12
+PERIOD_MIN = 1
+PERIOD_MAX = PERIOD_COUNT+1
 
 def buildKey(year, period, family):
     return str(year) + "," + \
@@ -33,7 +43,8 @@ def calcDist(x1, x2):
 
     return euclideanDist([x1Vals[0],x1Vals[1]], [x2Vals[0],x2Vals[1]])
 
-def knn(dataset, new, k=K_DEFAULT_PARAM, familyKeys=None, filterMaxMin=False, useMedian=False):
+def knn(dataset, new, k=K_DEFAULT_PARAM, familyKeys=FAMILY_KEYS_DEFAULT_PARAM, \
+    filterMaxMin=FILTER_MAX_MIN_DEFAULT_PARAM, useMedian=USE_MEADIAN_DEFAULT_PARAM):
     # Filter the keys in dataset with family of interest
 
     if familyKeys:
@@ -68,31 +79,14 @@ def knn(dataset, new, k=K_DEFAULT_PARAM, familyKeys=None, filterMaxMin=False, us
         return dataset[ kElements[int(float(len(kElements))/2.0)][0] ] # Return the median (element in midle of the sorted list)
 
 # ======================= TESTS ======================== #
-
-def testRun():
-    inputs, families = input_loader.getInput()
-
-    for count in range(10):
-        # Pick (remove) a random value from the dataset
-        testingElementKey = random.choice(inputs.keys())
-        testingVal = inputs.pop(testingElementKey)
-        print("Picked: " + str(testingElementKey))
-        print("Val: " + str(testingVal) + " ~= " + str(knn(inputs, testingElementKey)))
-
-        #Add picked element back
-        inputs[testingElementKey] = testingVal
-
 def predictYear(yearToPredict):
-    PERIOD_COUNT = 11*12
-    PERIOD_MIN = 1
-    PERIOD_MAX = PERIOD_COUNT+1
 
     # Load inputs
     inputs, families = input_loader.getInput()
     predictedEntries = dict()
 
     for i in range(len(families)):
-        print("Predicting: " + str((float(i)/float(len(families)))*100.0) + "%)")
+        print("Predicting: " + str((float(i)/float(len(families)))*100.0) + " % ")
         keysOfInterest = filter(lambda f: families[i] in f, inputs.keys())
         for period in range(PERIOD_MIN, PERIOD_MAX):
             tempKey = buildKey(yearToPredict, period, families[i])
@@ -105,29 +99,44 @@ def predictYear(yearToPredict):
     saveEntriesDict(PREDICTED_OUTPUT_FILE_PATH, inputs)
     print("Done")
 
-def calcRandomAccuracy(countPerConfig, kParams):
+def calcRandomAccuracy(countPerConfig, kParams, familesToPredict=None):
 
     booleanOpts = [True, False]
 
     # Load inputs
     inputs, families = input_loader.getInput()
 
+    print("Total keys: " + str(len(inputs.keys())))
+    if familesToPredict: # Not all families
+        validKeys = []
+        for validFamily in familesToPredict:
+            validKeys += filter(lambda k: validFamily in k, inputs.keys())
+    else:
+        validKeys = inputs.keys() # All families
+
+    print("Eligible keys to test: " + str(len(validKeys)))
+
     results = []
-    for kParam in kParams:
+    for i in range(len(kParams)):
+        print("Testing: " + str((float(i)/float(len(kParams)))*100.0) + " %")
         for filterMaxMinParam in booleanOpts:
             for useMedianParam in booleanOpts:
                 errors = []
-                for i in range(countPerConfig):
+                correctPredictionCount = 0
+                for j in range(countPerConfig):
                     # Pick (remove) a random value from the dataset
-                    testingElementKey = random.choice(inputs.keys())
+                    testingElementKey = random.choice(validKeys)
                     testingVal = inputs.pop(testingElementKey)
 
                     # Predict the removed value
                     predictedVal = knn(inputs, testingElementKey, \
-                        k=kParam, filterMaxMin=filterMaxMinParam, useMedian=useMedianParam)
+                        k=kParams[i], filterMaxMin=filterMaxMinParam, useMedian=useMedianParam)
 
                     # Register the error (absolute distance between the predicted and the real value)
-                    errors.append(abs(testingVal-predictedVal))
+                    erroTemp = abs(testingVal-predictedVal)
+                    errors.append(erroTemp)
+                    if(compare(testingVal, predictedVal, errorMarginPercentage=ERROR_MARGIN_DEFAULT)):
+                        correctPredictionCount += 1
 
                     # Return the removed elemento to the datase
                     inputs[testingElementKey] = testingVal
@@ -135,19 +144,61 @@ def calcRandomAccuracy(countPerConfig, kParams):
                 # Append the result object
                 errors = sorted(errors)
                 resultTemp = KnnResult()
-                resultTemp.paramK = kParam
+                resultTemp.paramK = kParams[i]
                 resultTemp.filterMaxMin = filterMaxMinParam
                 resultTemp.useMedian = useMedianParam
                 resultTemp.averageError = sum(errors)/float(len(errors))
-                resultTemp.medianError = errors[ int((len(errors)/2)) ]
                 resultTemp.minError, resultTemp.maxError = errors[0], errors[-1]
+                resultTemp.accuracy = correctPredictionCount/float(len(errors))
                 results.append(resultTemp)
+        i += 1
 
     saveKnnResultList(results, RNDM_ACC_OUTPUT_FILE_PATH)
 
+def calcAccuracyForYears(yearsToPredict):
+    inputs, families = input_loader.getInput()
+    predictedEntries = dict()
+    removedEntries = dict()
+
+    # Removing real data of the years
+    for family in families:
+        for year in yearsToPredict:
+            for period in range(PERIOD_MIN, PERIOD_MAX):
+                tempKey = buildKey(year, period, family)
+                tempVal = inputs.pop(tempKey, None)
+                if tempVal != None:
+                    if tempKey in removedEntries:
+                        print("[ERROR]: Knn.calcAccuracyForYears() - Duplicated entry in removedEntries")
+                    else:
+                        removedEntries[tempKey] = tempVal
+                else:
+                    print("No data in inputs for: " + tempKey)
+
+    # Predicting years gradually
+    for i in range(len(families)):
+        print("Predicting: " + str((float(i)/float(len(families)))*100.0) + " %")
+        for year in yearsToPredict:
+            for period in range(PERIOD_MIN, PERIOD_MAX):
+                tempKey = buildKey(year, period, families[i])
+
+                # Predict
+                keysOfInterest = filter(lambda f: families[i] in f, inputs.keys()) # Need to re-filter to consider entries added in last loop
+                predictedEntries[tempKey] = knn(inputs, tempKey, familyKeys=keysOfInterest)
+
+                # Back with the real data
+                tempVal = removedEntries.pop(tempKey, None)
+                if tempVal != None:
+                    inputs[tempKey] = tempVal
+                else:
+                    print("No data in removedEntries for: " + tempKey)
+        i += 1
+
+    print("Saving predicted file")
+    saveEntriesDict(YEARS_ACC_OUTPUT_FILE_PATH, predictedEntries)
+    print("Done. Accuracy: " + str(calcAccuracy(correctValMap=inputs, predictedValMap=predictedEntries, errorMargin=ERROR_MARGIN_DEFAULT)))
 
 #testRun()
 #predictYear(2016)
-#calcRandomAccuracy(200, range(30))
-
-## TODO: Implementar o teste de acurária avaliando apenas os elementos com as 7 familias mais importantes
+#calcRandomAccuracy(200, range(1, 25)) # All families
+#calcRandomAccuracy(200, range(1, 20), familesToPredict=["CAABSK5C40", "CAABCB5C40", "CACICK5C40", "CAABSK5B20", "CAABCA5C40", "CAABSK9C50", "CAABCZ5C40"]) # 7 more selled
+calcAccuracyForYears([2011, 2012, 2013, 2014, 2015])
