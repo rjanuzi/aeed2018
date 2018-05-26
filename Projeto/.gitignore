@@ -2,4 +2,4 @@ treated.xlsx
 *.pyc
 predicted.xlsx
 calcRandomAccuracyResult.xlsx
-calcRandomAccuracyForYearsResult.xlsx
+calcAccuracyForYarsResult.xlsx
