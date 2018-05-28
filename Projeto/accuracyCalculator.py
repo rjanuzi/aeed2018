@@ -28,7 +28,11 @@ def createBlocksGenerator(list, blockSize):
 def kFoldSplit(map, blocksCount):
     mapItens = map.items()
     resultMapsList = []
-    blocksGenerator = createBlocksGenerator(mapItens, ceil( len(mapItens) / float(blocksCount) ))
+    blocksSize = ceil(len(mapItens)/float(blocksCount))
+
+    print("Spliting " + str(len(mapItens)) + " inputs, into " + str(blocksCount) + " blocks of " + str(blocksSize))
+
+    blocksGenerator = createBlocksGenerator(list=mapItens, blockSize=blocksSize)
     for block in blocksGenerator:
         tempDict = {}
         for item in block:

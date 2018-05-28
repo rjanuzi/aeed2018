@@ -3,3 +3,9 @@ treated.xlsx
 predicted.xlsx
 calcRandomAccuracyResult.xlsx
 calcAccuracyForYearsResult.xlsx
+calcRandomAccuracyResult_all_families.xlsx
+calcRandomAccuracyResult_top_7.xlsx
+knn_kfold_predictions.xlsx
+mlp_kfold_predictions.xlsx
+treated_com_100_mil.xlsx
+treated_com_50_mil.xlsx

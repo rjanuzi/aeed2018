@@ -8,7 +8,8 @@ DATE_COL = 0
 FAMILY_COL = 2
 SALES_COL = 6
 
-PERIOD_COUNT = 11*12
+#PERIOD_COUNT = 11*12
+PERIOD_COUNT = 6*12
 PERIOD_MIN = 1
 PERIOD_MAX = PERIOD_COUNT+1
 YEAR_MIN = 2010
@@ -115,7 +116,7 @@ for row in ws.iter_rows(min_row = 2, max_col = 13):
     try:
         # Generate the map key
         temp_key = buildKey(row[DATE_COL].value.year, \
-                    str( calcPeriod_v2(row[DATE_COL].value.day, row[DATE_COL].value.month) ), \
+                    str( calcPeriod(row[DATE_COL].value.day, row[DATE_COL].value.month) ), \
                     tempFamilyName )
 
         # Adjust quantity to the map
